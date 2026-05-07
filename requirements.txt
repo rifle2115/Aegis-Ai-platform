@@ -12,7 +12,6 @@ scikit-learn
 numpy<2.0
 lightgbm
 opencv-python-headless
-tensorflow
 transformers<5.0
 torch
 PyMuPDF

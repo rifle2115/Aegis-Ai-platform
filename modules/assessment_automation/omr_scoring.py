@@ -2,8 +2,6 @@ import streamlit as st
 import cv2
 import numpy as np
 import pandas as pd
-import tensorflow as tf
-from tensorflow.keras import layers, models
 
 
 st.title("🎓 Deep Learning OMR Grader")
@@ -32,83 +30,50 @@ def load_answer_key(file_like):
     return answer_dict
 
 # -------------------------
-# Build CNN for bubble classification
+# Bubble classifier using image analysis (no TensorFlow needed)
 # -------------------------
-@st.cache_resource
-def build_bubble_classifier():
-    model = models.Sequential([
-        layers.Input(shape=(40, 40, 1)),
-        layers.Conv2D(32, 3, activation="relu", padding="same"),
-        layers.MaxPooling2D(2),
-        layers.Conv2D(64, 3, activation="relu", padding="same"),
-        layers.MaxPooling2D(2),
-        layers.Flatten(),
-        layers.Dropout(0.3),
-        layers.Dense(128, activation="relu"),
-        layers.Dense(2, activation="softmax")
-    ])
-    model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-    return model
-
-# -------------------------
-# Generate synthetic training data
-# -------------------------
-def generate_synthetic_data(n_samples=2000, size=40):
-    """Generate realistic OMR bubble training data"""
-    X, y = [], []
+def classify_bubble_cv(gray_img, bubble, size=40):
+    """Classify a bubble as filled or empty using image analysis.
+    Returns a confidence score between 0 (empty) and 1 (filled)."""
+    x, y, r = bubble['x'], bubble['y'], bubble['r']
     
-    for _ in range(n_samples // 2):
-        # Empty bubble
-        empty = np.ones((size, size), dtype=np.uint8) * 250
-        center = size // 2
-        radius = size // 3
-        cv2.circle(empty, (center, center), radius, 50, 2)
-        noise = np.random.normal(0, 8, empty.shape).astype(np.int16)
-        empty = np.clip(empty.astype(np.int16) + noise, 0, 255).astype(np.uint8)
-        X.append(empty)
-        y.append(0)
-        
-        # Filled bubble - darker, more filled
-        filled = np.ones((size, size), dtype=np.uint8) * 250
-        cv2.circle(filled, (center, center), radius, 50, 2)
-        # Heavy fill
-        cv2.circle(filled, (center, center), radius - 3, 80, -1)
-        # Add texture
-        for _ in range(150):
-            px = center + np.random.randint(-radius + 4, radius - 4)
-            py = center + np.random.randint(-radius + 4, radius - 4)
-            if (px - center)**2 + (py - center)**2 < (radius - 3)**2:
-                cv2.circle(filled, (px, py), 1, np.random.randint(40, 100), -1)
-        noise = np.random.normal(0, 8, filled.shape).astype(np.int16)
-        filled = np.clip(filled.astype(np.int16) + noise, 0, 255).astype(np.uint8)
-        X.append(filled)
-        y.append(1)
+    # Extract region
+    pad = int(r * 1.3)
+    x1, y1 = max(0, x - pad), max(0, y - pad)
+    x2, y2 = min(gray_img.shape[1], x + pad), min(gray_img.shape[0], y + pad)
     
-    X = np.array(X, dtype=np.float32) / 255.0
-    X = np.expand_dims(X, -1)
-    y = np.array(y, dtype=np.int32)
+    crop = gray_img[y1:y2, x1:x2]
     
-    idx = np.random.permutation(len(X))
-    return X[idx], y[idx]
-
-# -------------------------
-# Train model
-# -------------------------
-@st.cache_resource
-def get_trained_model():
-    with st.spinner("🧠 Training CNN on synthetic bubble data..."):
-        model = build_bubble_classifier()
-        X, y = generate_synthetic_data(n_samples=2000)
-        
-        split = int(0.85 * len(X))
-        model.fit(
-            X[:split], y[:split],
-            validation_data=(X[split:], y[split:]),
-            epochs=15,
-            batch_size=32,
-            verbose=0
-        )
-    return model
+    if crop.size == 0:
+        return 0.0
+    
+    # Method 1: Darkness score (lower pixel value = darker = filled)
+    center_region = crop[crop.shape[0]//4:3*crop.shape[0]//4, 
+                         crop.shape[1]//4:3*crop.shape[1]//4]
+    if center_region.size == 0:
+        return 0.0
+    darkness = (255 - np.mean(center_region)) / 255.0
+    
+    # Method 2: Threshold-based fill ratio
+    _, binary = cv2.threshold(crop, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    # Create circular mask
+    mask = np.zeros_like(binary)
+    center = (crop.shape[1] // 2, crop.shape[0] // 2)
+    radius = min(crop.shape[0], crop.shape[1]) // 3
+    cv2.circle(mask, center, radius, 255, -1)
+    # Calculate fill ratio within the circle
+    masked_binary = cv2.bitwise_and(binary, mask)
+    circle_area = np.sum(mask > 0)
+    filled_area = np.sum(masked_binary > 0)
+    fill_ratio = filled_area / circle_area if circle_area > 0 else 0
+    
+    # Method 3: Standard deviation (filled bubbles have lower std in center)
+    std_score = 1.0 - min(1.0, np.std(center_region) / 80.0)
+    
+    # Combine scores
+    combined_score = darkness * 0.4 + fill_ratio * 0.45 + std_score * 0.15
+    
+    return combined_score
 
 # -------------------------
 # Enhanced preprocessing
@@ -254,42 +219,6 @@ def organize_into_questions(bubbles, n_choices=5):
     return rows
 
 # -------------------------
-# Classify bubble with better thresholding
-# -------------------------
-def classify_bubble(model, gray_img, bubble, size=40):
-    """Extract and classify a single bubble"""
-    x, y, r = bubble['x'], bubble['y'], bubble['r']
-    
-    # Extract region
-    pad = int(r * 1.3)
-    x1, y1 = max(0, x - pad), max(0, y - pad)
-    x2, y2 = min(gray_img.shape[1], x + pad), min(gray_img.shape[0], y + pad)
-    
-    crop = gray_img[y1:y2, x1:x2]
-    
-    if crop.size == 0:
-        return 0, 0.0
-    
-    # Calculate darkness score (lower = darker = filled)
-    center_region = crop[crop.shape[0]//4:3*crop.shape[0]//4, 
-                         crop.shape[1]//4:3*crop.shape[1]//4]
-    darkness = 255 - np.mean(center_region)
-    
-    # Resize for CNN
-    crop_resized = cv2.resize(crop, (size, size))
-    crop_norm = crop_resized.astype(np.float32) / 255.0
-    crop_input = np.expand_dims(np.expand_dims(crop_norm, -1), 0)
-    
-    # Predict
-    pred = model.predict(crop_input, verbose=0)[0]
-    cnn_filled_score = pred[1]
-    
-    # Combine CNN prediction with darkness
-    combined_score = cnn_filled_score * 0.6 + (darkness / 255.0) * 0.4
-    
-    return combined_score
-
-# -------------------------
 # Main processing
 # -------------------------
 if uploaded_img and uploaded_key:
@@ -356,9 +285,6 @@ if uploaded_img and uploaded_key:
             st.error("❌ Could not organize bubbles into rows")
             st.stop()
     
-    # Train/load model
-    model = get_trained_model()
-    
     # Grade
     st.write("---")
     st.subheader("📊 Grading Results")
@@ -370,10 +296,10 @@ if uploaded_img and uploaded_key:
         if q_num > total_questions:
             break
         
-        # Get scores for each bubble
+        # Get scores for each bubble using CV-based classifier
         scores = []
         for bubble in question_bubbles:
-            score = classify_bubble(model, gray, bubble)
+            score = classify_bubble_cv(gray, bubble)
             scores.append(score)
         
         # Find filled bubble (highest score)
