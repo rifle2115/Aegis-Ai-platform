@@ -12,7 +12,7 @@ scikit-learn
 numpy
 lightgbm
 opencv-python-headless
-tensorflow-cpu
+tensorflow
 transformers
 torch
 PyMuPDF
