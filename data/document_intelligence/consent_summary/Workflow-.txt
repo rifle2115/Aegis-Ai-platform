@@ -1,0 +1,40 @@
+Workflow-
+User Upload (PDF/Text)
+          │
+          ▼
+  PDF/Text Extraction
+  - Convert PDF to plain text
+  - Remove headers/footers/page numbers
+          │
+          ▼
+     Preprocessing
+  - Split text into sentences/paragraphs
+  - Clean punctuation, line breaks
+          │
+          ▼
+Sentence Classification / Extraction
+  - Keyword Matching:
+      e.g., risk, injury, liability, mandatory, duration
+  - Sentence Embeddings (BERT, RoBERTa):
+      Find sentences semantically related to core categories
+  - Optional Classifier:
+      Label sentences as Risk / Obligation / Duration / Liability / Signature
+          │
+          ▼
+   Summarization / Structuring
+  - Extractive Summary:
+      Select top 1–2 sentences per category
+  - Optional Abstractive Summary:
+      Use BART/T5 to rewrite into concise plain-language summary
+          │
+          ▼
+Output: Structured Summary
+  Example:
+  --------------------------------
+  Adventure Consent Form Summary
+  - Risks: Participant may experience injuries from falls or equipment misuse.
+  - Obligations: Helmets must be worn; follow instructor rules.
+  - Duration: Activity lasts approximately 3 hours.
+  - Liability: Organization not responsible for accidents from rule violations.
+  - Consent: Participant signature required.
+  --------------------------------
