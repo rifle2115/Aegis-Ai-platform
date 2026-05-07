@@ -1,13 +1,13 @@
-AegisAI — Unified AI Decision Platform
+# AegisAI — Unified AI Decision Platform
 
 
 
 
-Overview
+## Overview
 
 AegisAI is a modular AI-powered decision and automation platform that integrates multiple intelligent systems into a single unified environment.
 
-The platform combines:
+## The platform combines:
 
 Natural Language Processing (NLP)
 Deep Learning
@@ -19,7 +19,7 @@ into a centralized AI ecosystem capable of automating real-world decision workfl
 
 Instead of functioning as isolated machine learning projects, AegisAI provides a unified multi-module architecture where every component operates as a specialized AI service.
 
-Features
+## Features
 Document Intelligence
 Resume Relevance Analyzer
 
