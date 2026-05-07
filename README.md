@@ -20,31 +20,24 @@ into a centralized AI ecosystem capable of automating real-world decision workfl
 Instead of functioning as isolated machine learning projects, AegisAI provides a unified multi-module architecture where every component operates as a specialized AI service.
 
 ## Features
-Document Intelligence
-Resume Relevance Analyzer
 
-### Analyzes resumes against job descriptions using NLP pipelines.
+### Document Intelligence.
 
 Capabilities
-Skill extraction
-Keyword matching
-Resume relevance scoring
-Missing skill identification
-Candidate recommendation generation
-Consent Form Summarizer
+Intelligent document analysis
+NLP-based information extraction
+AI-powered summarization
+Keyword and skill matching
+Relevance and recommendation scoring
+Risk and important clause detection
+Automated assessment evaluation
+OMR detection and answer extraction
+Performance analytics generation
+Readability and insight generation
+Deep learning–based prediction workflows
+Automated decision-support processing
 
-### Processes medical/legal consent forms and generates concise AI-based summaries.
-
-Capabilities
-AI summarization
-Risk extraction
-Important clause highlighting
-Simplified readability generation
-NLP-based understanding
-Assessment Automation
-Deep Learning OMR Scoring System
-
-### Automates evaluation of Optical Mark Recognition (OMR) answer sheets.
+### Assessment Automation.
 
 Capabilities
 OMR detection
@@ -55,7 +48,7 @@ Performance analytics visualization
 Predictive Analytics
 Hospital Delay Prediction
 
-### Predicts operational delays within hospital systems using machine learning models.
+### Predictive Analytics.
 
 Capabilities
 Delay forecasting
@@ -66,7 +59,7 @@ Real-time operational insights
 Trust & Safety Analytics
 Deepfake Spread Prevention
 
-### Uses Social Network Analysis (SNA) and graph analytics to study misinformation propagation.
+### Trust & Safety Analytics.
 
 Capabilities
 Network propagation analysis
