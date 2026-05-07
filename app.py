@@ -1,3 +1,7 @@
+import os
+os.environ["USE_TF"] = "NO"
+os.environ["USE_TORCH"] = "1"
+
 import streamlit as st
 
 # --- Global Page Configuration ---
