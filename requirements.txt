@@ -13,7 +13,7 @@ numpy<2.0
 lightgbm
 opencv-python-headless
 tensorflow
-transformers
+transformers<5.0
 torch
 PyMuPDF
 joblib
