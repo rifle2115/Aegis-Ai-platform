@@ -5,14 +5,15 @@ matplotlib
 python-louvain
 pdfplumber
 docx2txt
-spacy
+spacy==3.7.5
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 sentence-transformers
 scikit-learn
-numpy
+numpy<2.0
 lightgbm
 opencv-python-headless
 tensorflow
 transformers
 torch
 PyMuPDF
+joblib

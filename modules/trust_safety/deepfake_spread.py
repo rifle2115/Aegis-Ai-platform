@@ -36,7 +36,12 @@ def load_analysis_data():
     with open("data/trust_safety/deepfake_spread/graph_with_communities.json", 'r') as f:
         graph_data = json.load(f)
 
-    G_raw = json_graph.node_link_graph(graph_data)
+    # NetworkX 3.x expects edges="edges" by default, but our JSON uses "links"
+    try:
+        G_raw = json_graph.node_link_graph(graph_data, edges="links")
+    except TypeError:
+        # Fallback for older NetworkX versions that don't have the edges parameter
+        G_raw = json_graph.node_link_graph(graph_data)
     # Force all nodes to be strings for consistency and preserve attributes
     G = nx.DiGraph()
     for n, attr in G_raw.nodes(data=True):
