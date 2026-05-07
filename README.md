@@ -23,7 +23,7 @@ Instead of functioning as isolated machine learning projects, AegisAI provides a
 Document Intelligence
 Resume Relevance Analyzer
 
-Analyzes resumes against job descriptions using NLP pipelines.
+### Analyzes resumes against job descriptions using NLP pipelines.
 
 Capabilities
 Skill extraction
@@ -33,7 +33,7 @@ Missing skill identification
 Candidate recommendation generation
 Consent Form Summarizer
 
-Processes medical/legal consent forms and generates concise AI-based summaries.
+### Processes medical/legal consent forms and generates concise AI-based summaries.
 
 Capabilities
 AI summarization
@@ -44,7 +44,7 @@ NLP-based understanding
 Assessment Automation
 Deep Learning OMR Scoring System
 
-Automates evaluation of Optical Mark Recognition (OMR) answer sheets.
+### Automates evaluation of Optical Mark Recognition (OMR) answer sheets.
 
 Capabilities
 OMR detection
@@ -55,7 +55,7 @@ Performance analytics visualization
 Predictive Analytics
 Hospital Delay Prediction
 
-Predicts operational delays within hospital systems using machine learning models.
+### Predicts operational delays within hospital systems using machine learning models.
 
 Capabilities
 Delay forecasting
@@ -66,7 +66,7 @@ Real-time operational insights
 Trust & Safety Analytics
 Deepfake Spread Prevention
 
-Uses Social Network Analysis (SNA) and graph analytics to study misinformation propagation.
+### Uses Social Network Analysis (SNA) and graph analytics to study misinformation propagation.
 
 Capabilities
 Network propagation analysis
